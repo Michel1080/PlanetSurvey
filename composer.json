@@ -1,0 +1,7 @@
+{
+    "require": {
+        "facebook/graph-sdk": "^5.1",
+        "phpoffice/phpspreadsheet": "^2.2",
+        "google/apiclient": "^2.17" 
+    }
+}

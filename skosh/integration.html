@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integration Page</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        .section h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        input[type="text"], input[type="url"], textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-top: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .youtube-preview {
+            margin-top: 10px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .facebook-post, .payment-form {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .messenger-container {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            height: 400px;
+            overflow-y: scroll;
+            margin-top: 10px;
+        }
+        .messenger-chat {
+            display: flex;
+            align-items: flex-end;
+            margin-bottom: 10px;
+        }
+        .messenger-chat .message {
+            background-color: #e1ffc7;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 70%;
+        }
+        .messenger-chat.admin .message {
+            background-color: #d4e6ff;
+            margin-left: auto;
+        }
+        .messenger-input {
+            display: flex;
+            margin-top: 10px;
+        }
+        .messenger-input input[type="text"] {
+            flex: 1;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Integration Management</h1>
+
+        <!-- Upload YouTube Video Section -->
+        <div class="section">
+            <h2>Upload YouTube Video</h2>
+            <div class="form-group">
+                <label for="youtube-url">YouTube Video URL:</label>
+                <input type="url" id="youtube-url" placeholder="Enter YouTube URL">
+                <button onclick="previewYouTubeVideo()">Preview Video</button>
+            </div>
+            <div id="youtube-preview" class="youtube-preview"></div>
+        </div>
+
+        <!-- Post to Facebook Section -->
+        <div class="section">
+            <h2>Post to Facebook</h2>
+            <div class="facebook-post">
+                <div class="form-group">
+                    <label for="facebook-post-content">Post Content:</label>
+                    <textarea id="facebook-post-content" rows="4" placeholder="What's on your mind?"></textarea>
+                </div>
+                <button>Post to Facebook</button>
+            </div>
+        </div>
+
+        <!-- Facebook Messenger Integration Section -->
+        <div class="section">
+            <h2>Facebook Messenger</h2>
+            <div class="messenger-container" id="messenger-container">
+                <div class="messenger-chat">
+                    <div class="message">
+                        Hi, how can I assist you today?
+                    </div>
+                </div>
+                <div class="messenger-chat admin">
+                    <div class="message">
+                        I need some help with my account.
+                    </div>
+                </div>
+            </div>
+            <div class="messenger-input">
+                <input type="text" id="messenger-input" placeholder="Type a message">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+
+        <!-- Payment Integration Section -->
+        <div class="section">
+            <h2>Payment Integration</h2>
+            <div class="payment-form">
+                <div class="form-group">
+                    <label for="employee-name">Employee Name:</label>
+                    <input type="text" id="employee-name" placeholder="Enter employee name">
+                </div>
+                <div class="form-group">
+                    <label for="payment-amount">Payment Amount:</label>
+                    <input type="text" id="payment-amount" placeholder="Enter amount">
+                </div>
+                <div class="form-group">
+                    <label for="payment-method">Payment Method:</label>
+                    <input type="text" id="payment-method" placeholder="Enter payment method (e.g., Maya)">
+                </div>
+                <button>Send Payment</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function previewYouTubeVideo() {
+            const url = document.getElementById('youtube-url').value;
+            const youtubeId = url.split('v=')[1];
+            const embedUrl = `https://www.youtube.com/embed/${youtubeId}`;
+            document.getElementById('youtube-preview').innerHTML = `
+                <iframe width="100%" height="315" src="${embedUrl}" frameborder="0" allowfullscreen></iframe>
+            `;
+        }
+
+        function sendMessage() {
+            const message = document.getElementById('messenger-input').value;
+            if (message.trim() !== '') {
+                const container = document.getElementById('messenger-container');
+                const newMessage = document.createElement('div');
+                newMessage.classList.add('messenger-chat', 'admin');
+                newMessage.innerHTML = `<div class="message">${message}</div>`;
+                container.appendChild(newMessage);
+                document.getElementById('messenger-input').value = '';
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+    </script>
+</body>
+</html>

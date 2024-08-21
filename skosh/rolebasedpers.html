@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Role-Based Permissions</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        select, input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-top: 5px;
+        }
+        .permissions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .permissions label {
+            background-color: #e7f5e7;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+        }
+        .permissions input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Role-Based Permission Management</h1>
+        <form id="roleForm">
+            <div class="form-group">
+                <label for="role_name">Select Role:</label>
+                <select name="role_name" id="role_name" required>
+                    <option value="" disabled selected>Select a role</option>
+                    <option value="Chief executive">Chief executive</option>
+                    <option value="Top managers">Top managers</option>
+                    <option value="Mid managers">Mid managers</option>
+                    <option value="Frontline managers">Frontline managers</option>
+                    <option value="Other management staff">Other management staff</option>
+                    <option value="Village coordinators">Village coordinators</option>
+                    <option value="Subzone coordinators">Subzone coordinators</option>
+                    <option value="Public">Public</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Assign Permissions:</label>
+                <div class="permissions">
+                    <!-- Constituent Management Permissions -->
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Gather demographic and psychographic data">
+                        Gather demographic and psychographic data
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Geo-tag household location">
+                        Geo-tag household location
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Gather other variables as required">
+                        Gather other variables as required
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Take and store profile picture">
+                        Take and store profile picture
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Request and receive information">
+                        Request and receive information
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Search/retrieve individual profile">
+                        Search/retrieve individual profile
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Search/retrieve assigned constituents profile">
+                        Search/retrieve assigned constituents profile
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Online and offline data-gathering">
+                        Online and offline data-gathering
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Add unlimited variables">
+                        Add unlimited variables
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Add variables with ease">
+                        Add variables with ease
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Send text messages or call members">
+                        Send text messages or call members
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Send message using FB account">
+                        Send message using FB account
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Send message using email">
+                        Send message using email
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Conduct audio conference using FB">
+                        Conduct audio conference using FB
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Conduct video conference using FB">
+                        Conduct video conference using FB
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Text blast using stored mobile number">
+                        Text blast using stored mobile number
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Send messages to many using FB">
+                        Send messages to many using FB
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Send payments/payouts using GCash">
+                        Send payments/payouts using GCash
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Crosstabulate between variables">
+                        Crosstabulate between variables
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Inferential analysis ready">
+                        Inferential analysis ready
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Export data in MS Excel">
+                        Export data in MS Excel
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Import data in MS Excel">
+                        Import data in MS Excel
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="View all app logs">
+                        View all app logs
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Cancel or prompt for duplication">
+                        Cancel or prompt for duplication
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Edit data of any constituents">
+                        Edit data of any constituents
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Edit data of assigned constituents only">
+                        Edit data of assigned constituents only
+                    </label>
+
+                    <!-- Analysis, Strategy Development, and Planning Permissions -->
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Analyze data using graphs, charts, tables, and maps">
+                        Analyze data using graphs, charts, tables, and maps
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Set general target per subzone">
+                        Set general target per subzone
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Set particular target at subzone level">
+                        Set particular target at subzone level
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Evaluate real-time accomplishments vs. population">
+                        Evaluate real-time accomplishments vs. population
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Evaluate real-time accomplishments vs. set targets">
+                        Evaluate real-time accomplishments vs. set targets
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Auto-generate performance categories for all units">
+                        Auto-generate performance categories for all units
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Auto-generate performance categories for assigned unit">
+                        Auto-generate performance categories for assigned unit
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Auto-generate overall slippage and deficiency">
+                        Auto-generate overall slippage and deficiency
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Auto-generate slippage and deficiency for assigned unit">
+                        Auto-generate slippage and deficiency for assigned unit
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Auto-generate and recommend strategies">
+                        Auto-generate and recommend strategies
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Auto-generate and recommend strategies for assigned unit">
+                        Auto-generate and recommend strategies for assigned unit
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Auto-generate historical data using graphs and maps">
+                        Auto-generate historical data using graphs and maps
+                    </label>
+
+                    <!-- Campaign Staff Management Permissions -->
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Able to text and call campaign staff">
+                        Able to text and call campaign staff
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Able to send messages using FB account names">
+                        Able to send messages using FB account names
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Able to conduct audio conference with staff">
+                        Able to conduct audio conference with staff
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Able to conduct video conference with staff">
+                        Able to conduct video conference with staff
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Send honorarium to staff via GCash">
+                        Send honorarium to staff via GCash
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Auto-generate chart based on personnel information">
+                        Auto-generate chart based on personnel information
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Send message using email">
+                        Send message using email
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Take and store profile picture of personnel">
+                        Take and store profile picture of personnel
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Request campaign budget">
+                        Request campaign budget
+                    </label>
+
+                    <!-- Social Media Integration Permissions -->
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Share content to social media">
+                        Share content to social media
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Send social media feeds within app">
+                        Send social media feeds within app
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Track performance of social media efforts">
+                        Track performance of social media efforts
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Automate scheduled posting">
+                        Automate scheduled posting
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Allow users to sign in using email, FB, etc.">
+                        Allow users to sign in using email, FB, etc.
+                    </label>
+
+                    <!-- Conduct of Survey Permissions -->
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Develop survey tool/questionnaire">
+                        Develop survey tool/questionnaire
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Determine sampling size">
+                        Determine sampling size
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Conduct random sampling">
+                        Conduct random sampling
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Conduct text, call, and online survey">
+                        Conduct text, call, and online survey
+                    </label>
+                    <label>
+                        <input type="checkbox" name="permissions[]" value="Process data and generate result using charts">
+                        Process data and generate result using charts
+                    </label>
+                </div>
+            </div>
+            <button type="submit">Save Role Permissions</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('roleForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the form from submitting the traditional way
+
+            const role = document.getElementById('role_name').value;
+            const permissions = Array.from(document.querySelectorAll('input[name="permissions[]"]:checked'))
+                .map(cb => cb.value);
+
+            console.log('Selected Role:', role);
+            console.log('Selected Permissions:', permissions);
+
+            // This is where you can handle form submission or further process the data
+        });
+    </script>
+</body>
+</html>
