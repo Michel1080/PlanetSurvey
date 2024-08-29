@@ -746,7 +746,7 @@ if (!empty($_SESSION['user'])) {
                 <!-- MANAGE DATA -->
                 <div class="menu-item">
                     <h3>ADD VARIABLES</h3>
-                    <p>Export</p>
+                    <p id="export">Export</p>
                     <p id = "import">Import</p>
                     <p>Logs</p>
                     <p>Edit Criteria</p>
@@ -1339,7 +1339,9 @@ if (!empty($_SESSION['user'])) {
     });
 
 
-
+    document.getElementById('export').addEventListener('click', function() {
+        window.location.href = 'download.php'; // Link to your PHP script
+    });
 
 
 </script>
