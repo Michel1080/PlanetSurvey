@@ -4,13 +4,16 @@ require 'vendor/autoload.php';
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
-$spreadsheet = IOFactory::load('skad_data_dummy_iv_080124.xlsx');
+$spreadsheet = IOFactory::load('data.xlsx');
 $sheet = $spreadsheet->getActiveSheet();
 $categories = [
     'PROVINCE' => [],
     'CITY' => [],
     'BARANGAY' => [],
     'PRECINCT' => [],
+    'GOVERNOR PREFERENCE' => [],
+    'SECOND DISTRICT CONGRESSMAN PREFERENCE' => [],
+    'MAYOR PREFERENCE' => [],
     'SEX' => []
 ];
 $rowNumber = 0;
@@ -30,6 +33,9 @@ foreach ($sheet->getRowIterator() as $row) {
         $categories['CITY'][$data[5]] = ($categories['CITY'][$data[5]] ?? 0) + 1;
         $categories['BARANGAY'][$data[6]] = ($categories['BARANGAY'][$data[6]] ?? 0) + 1;
         $categories['PRECINCT'][$data[7]] = ($categories['PRECINCT'][$data[7]] ?? 0) + 1;
+        $categories['GOVERNOR PREFERENCE'][$data[11]] = ($categories['GOVERNOR PREFERENCE'][$data[11]] ?? 0) + 1;
+        $categories['SECOND DISTRICT CONGRESSMAN PREFERENCE'][$data[12]] = ($categories['SECOND DISTRICT CONGRESSMAN PREFERENCE'][$data[12]] ?? 0) + 1;
+        $categories['MAYOR PREFERENCE'][$data[13]] = ($categories['MAYOR PREFERENCE'][$data[13]] ?? 0) + 1;
         $categories['SEX'][$data[2]] = ($categories['SEX'][$data[2]] ?? 0) + 1;
         $voters[] = [
             'name' => $data[0],
@@ -56,7 +62,6 @@ foreach ($categories as $key => $data) {
         $categories[$key][$location] = ($count / $totalVotes) * 100;
     }
 }
-
 $categoriesJson = json_encode($categories);
 $votersJson = json_encode($voters);
 
@@ -426,12 +431,21 @@ if (!empty($_SESSION['user'])) {
 
         <!-- Dropdown and Search Bar -->
         <div class="dropdown-container">
-            <div>
-                <label for="governor-preference">GOVERNOR PREFERENCE:</label>
-                <select id="governor-preference">
-                    <option value="gov1">Mario Heosete</option>
-                    <option value="gov2">Evelyn Bantug</option>
-                    <option value="gov3">Mutatu Ngara</option>
+            
+            <div id = "cityoptiondiv" style = "display:none;">
+                <label for="city-preference" id = "optionlbl"></label>
+                <select id="optiontype" onchange="updateData()">
+                    
+                </select>
+            </div>
+            <div id = "titlediv" style = "display:none;">
+                <label for="governor-preference">SURVEY QUESTIONS:</label>
+                <select id="governor-preference" onchange="titleChange(this)">
+                    <option value=""></option>
+                    <option value="governorPreference">GOVERNOR PREFERENCE</option>
+                    <option value="secondDistrictCongressmanPreference">SECOND DISTRICT CONGRESSMAN PREFERENCE</option>
+                    <option value="mayorPreference">MAYOR PREFERENCE
+                    </option>
                     <!-- Add more options as needed -->
                 </select>
             </div>
@@ -443,7 +457,7 @@ if (!empty($_SESSION['user'])) {
         <!-- Graphs -->
         <div class="graphs">
             <div class="graph">
-                <h2>Governor Preference</h2>
+                <h2 id = "barchart_title">Governor Preference</h2>
                 <canvas id="myBarChart" width="400" height="200"></canvas> <!-- Corrected ID -->
             </div>
             <div class="graph">
@@ -497,7 +511,7 @@ if (!empty($_SESSION['user'])) {
                 </div>
                 <div>
                     <h3>LINE GRAPHS</h3>
-                    <p data-category="PROVINCE" class="menu-item-child" data-type="LINE-GRAPHS">Provincial</p>
+                    <p data-category="PROVINCE" class="menu-item-child" data-type="LINE-GRAPHS">search</p>
                     <p data-category="PROVINCE" class="menu-item-child" data-type="LINE-GRAPHS">District</p>
                     <p data-category="CITY" class="menu-item-child" data-type="LINE-GRAPHS">Municipal/City</p>
                     <p data-category="BARANGAY" class="menu-item-child" data-type="LINE-GRAPHS">Barangay</p>
@@ -506,7 +520,7 @@ if (!empty($_SESSION['user'])) {
                 </div>
                 <div>
                     <h3>TABLES</h3>
-                    <p>Provincial</p>
+                    <p>search</p>
                     <p>District</p>
                     <p>Municipal/City</p>
                     <p>Barangay</p>
@@ -733,13 +747,24 @@ if (!empty($_SESSION['user'])) {
                 <div class="menu-item">
                     <h3>ADD VARIABLES</h3>
                     <p>Export</p>
-                    <p>Import</p>
+                    <p id = "import">Import</p>
                     <p>Logs</p>
                     <p>Edit Criteria</p>
                     <p>Password</p>
                 </div>
             <?php } ?>
 
+            <div id = "fileuploaddiv" class = "popup">
+                <div class="popup-content">
+                <span class="close">&times;</span>
+                    <form id="uploadForm" action="fileupload.php" method="post" enctype="multipart/form-data">
+                        <label for="fileToUpload">Choose a file(only *.xlsx):</label>
+                        <input type="file" id="fileToUpload" name="fileToUpload" accept=".xlsx" required>
+                        <br><br>
+                        <button type="submit">Upload</button>
+                    </form>
+                </div>
+            </div>    
             <!-- Popup Modal -->
             <div id="searchPopup" class="popup">
                 <div class="popup-content">
@@ -797,9 +822,19 @@ if (!empty($_SESSION['user'])) {
         });
     });
 
+    $('#import').click(function(event){
+        // if (event.target.classList.contains('popup')) {
+            document.getElementById("fileuploaddiv").style.display = 'block';
+            document.getElementById("fileToUpload").innerHTML = "";
+            // console.log("ddd");
+        // }
+    });
+
+    
+
     window.onload = function () {
         var categories = <?php echo $categoriesJson; ?>;
-
+        // console.log(categories);
         var barCtx = document.getElementById('myBarChart').getContext('2d');
         var lineCtx = document.getElementById('myLineChart').getContext('2d');
 
@@ -807,7 +842,8 @@ if (!empty($_SESSION['user'])) {
             // Skip the first row (menu heading) in the data
             var labels = Object.keys(data);
             var values = Object.values(data);
-
+            // console.log(labels.sort());
+            labels = labels.map(label => label == "null" ? "Unknown" : label);
             chart.data.labels = labels;
             chart.data.datasets[0].data = values;
             chart.update();
@@ -889,8 +925,46 @@ if (!empty($_SESSION['user'])) {
         });
 
         // Set default data for "Provincial"
-        updateChart(myBarChart, categories['BARANGAY']);
-        updateChart(myLineChart, categories['BARANGAY']);
+        updateChart(myBarChart, categories['PROVINCE']);
+        updateChart(myLineChart, categories['PROVINCE']);
+        // console.log(categories);
+        titleChange = function (element){
+                document.getElementById("barchart_title").innerHTML = element.options[element.selectedIndex].innerHTML;
+                updateData();
+        }
+
+        updateData = function (){
+            var element1 = document.getElementById("optiontype");
+            var element2 = document.getElementById("governor-preference");
+            const selecttxt1 = element1.options[element1.selectedIndex].innerHTML.trim();
+            const selecttxt2 = element2.value.toString();
+            const type = document.getElementById("optionlbl").innerHTML == "PROVINCE:" ? "province" : "city";
+
+            if(selecttxt1 != "" && selecttxt2 != ""){
+                // alert("a");
+                var voters = <?php echo $votersJson; ?>;
+                // console.log(voters);
+                const filterData = voters.filter(voter => String(voter[type]).toLowerCase().includes(selecttxt1.toLowerCase()));
+                const count = filterData.length/100;
+                const chartData = filterData.reduce((acc, item) => {
+                    
+                    // console.log(count);
+                    const ftype = item[selecttxt2];                    
+                    // Increment the count for the category
+                    if (!acc[ftype]) {
+                        acc[ftype] = 0; // Initialize if not present
+                    }
+                    acc[ftype] += (1 / count);;
+                    return acc;
+                }, {});
+                           
+                updateChart(myBarChart, chartData);
+                updateChart(myLineChart, chartData);
+            }else{
+                header("Location: dashboard.php");
+            }
+            
+        }
 
         document.querySelectorAll('.menu-item-child').forEach(function (item) {
             item.addEventListener('click', function (event) {
@@ -898,15 +972,57 @@ if (!empty($_SESSION['user'])) {
                 event.stopPropagation();
                 var category = this.getAttribute('data-category');
                 var data = categories[category];
-
+                // console.log(category);
                 if (this.getAttribute('data-type') === 'HISTOGRAM') {
                     updateChart(myBarChart, data);
+                    document.getElementById("cityoptiondiv").style = "display:none";
+                    document.getElementById("titlediv").style = "display:none";
+                    // console.log(categories[category]);
+                    if(this.innerHTML == "Provincial") {
+                        document.getElementById("optionlbl").innerHTML = "PROVINCE:";
+                        const entriesArray = Object.entries(categories['PROVINCE']);
+                        var optionElement = document.getElementById("optiontype");
+                        optionElement.innerHTML = "";
+                        const option = document.createElement('option');
+                            option.value = "";
+                            option.textContent = "";
+                            optionElement.appendChild(option);                        
+                        entriesArray.forEach(function(value,index){
+                            const option = document.createElement('option');
+                            option.value = value[0];
+                            option.textContent = value[0];
+                            optionElement.appendChild(option);
+                        });
+                        document.getElementById("cityoptiondiv").style = "display:block";
+                        document.getElementById("titlediv").style = "display:block";
+                    }
+                    if(this.innerHTML == "Municipal/City") {
+                        document.getElementById("optionlbl").innerHTML = "Municipal/City:";
+                        const entriesArray = Object.entries(categories['CITY']);
+                        var optionElement = document.getElementById("optiontype");
+                        optionElement.innerHTML = "";
+                        const option = document.createElement('option');
+                            option.value = "";
+                            option.textContent = "";
+                            optionElement.appendChild(option);                        
+                        entriesArray.forEach(function(value,index){
+                            const option = document.createElement('option');
+                            option.value = value[0];
+                            option.textContent = value[0];
+                            optionElement.appendChild(option);
+                        });
+                        document.getElementById("cityoptiondiv").style = "display:block";
+                        document.getElementById("titlediv").style = "display:block";
+                    }
                 } else if (this.getAttribute('data-type') === 'LINE-GRAPHS') {
                     updateChart(myLineChart, data);
+                    document.getElementById("cityoptiondiv").style = "display:none";
                 }
             });
         });
     };
+
+
 
     $('.tab').click(function () {
         var tab_id = $(this).data('tab');

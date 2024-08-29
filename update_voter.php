@@ -3,7 +3,7 @@ require 'vendor/autoload.php';
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
-$filename = 'skad_data_dummy_iv_080124.xlsx';
+$filename = 'data.xlsx';
 $row = isset($_POST['row']) ? (int) $_POST['row'] : 0;
 
 if (file_exists($filename) && $row > 0) {

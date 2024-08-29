@@ -4,7 +4,7 @@ require 'vendor/autoload.php';
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
-$filename = 'skad_data_dummy_iv_080124.xlsx';
+$filename = 'data.xlsx';
 
 if (isset($_GET['row'])) {
     $rowToDelete = intval($_GET['row']);

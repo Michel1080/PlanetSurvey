@@ -3,7 +3,7 @@ require 'vendor/autoload.php';
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
-$filename = 'skad_data_dummy_iv_080124.xlsx';
+$filename = 'data.xlsx';
 
 if (file_exists($filename)) {
     $spreadsheet = IOFactory::load($filename);
