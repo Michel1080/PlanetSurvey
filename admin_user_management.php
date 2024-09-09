@@ -118,6 +118,21 @@ $stmt->close();
             width: 40px;
             margin-top: 20px;
         }
+        .planlist-back {
+            position: fixed;
+            float: left;
+            left: 20px;
+            bottom: 30px;
+            width: 50px;
+            height: 50px;
+        }
+        .planlist-back img{
+            width: 100%;
+            cursor: pointer;
+        }
+
+
+
     </style>
 </head>
 <body>
@@ -160,6 +175,6 @@ $stmt->close();
         </tbody>
     </table>
 </div>
-
+<div class="planlist-back"><img src="https://svgrepo.com/show/67631/back-arrow.svg" onclick="window.history.back()"></img></div>
 </body>
 </html>

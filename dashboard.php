@@ -17,17 +17,26 @@ $categories = [
     'SEX' => []
 ];
 $rowNumber = 0;
+$highestColumn = $sheet->getHighestColumn();
+$highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
+$dataArray = $sheet->toArray();
+for ($i=11; $i<$highestColumnIndex; $i++){
+   $fieldary[] =  $dataArray[0][$i];
+}
+// var_dump($filedary);exit;
+$voters = [];
 foreach ($sheet->getRowIterator() as $row) {
+    $cellIterator = $row->getCellIterator();
+    $cellIterator->setIterateOnlyExistingCells(false);    
     if ($rowNumber === 0) {
         $rowNumber++;
         continue;
     }
-    $cellIterator = $row->getCellIterator();
-    $cellIterator->setIterateOnlyExistingCells(false);
     $data = [];
     foreach ($cellIterator as $cell) {
         $data[] = $cell->getValue();
     }
+    // var_dump($data);exit;
     if (count($data) >= 14) {
         $categories['PROVINCE'][$data[4]] = ($categories['PROVINCE'][$data[4]] ?? 0) + 1;
         $categories['CITY'][$data[5]] = ($categories['CITY'][$data[5]] ?? 0) + 1;
@@ -37,7 +46,7 @@ foreach ($sheet->getRowIterator() as $row) {
         $categories['SECOND DISTRICT CONGRESSMAN PREFERENCE'][$data[12]] = ($categories['SECOND DISTRICT CONGRESSMAN PREFERENCE'][$data[12]] ?? 0) + 1;
         $categories['MAYOR PREFERENCE'][$data[13]] = ($categories['MAYOR PREFERENCE'][$data[13]] ?? 0) + 1;
         $categories['SEX'][$data[2]] = ($categories['SEX'][$data[2]] ?? 0) + 1;
-        $voters[] = [
+        $voter = [
             'name' => $data[0],
             'address' => $data[1],
             'sex' => $data[2],
@@ -48,22 +57,35 @@ foreach ($sheet->getRowIterator() as $row) {
             'precinct' => $data[7],
             'email' => $data[8],
             'fb' => $data[9],
-            'cpNo' => $data[10],
-            'governorPreference' => $data[11],
-            'secondDistrictCongressmanPreference' => $data[12],
-            'mayorPreference' => $data[13]
+            'cpNo' => $data[10]
+            // foreach($fieldary as $field){
+            //     'governorPreference' => $data[11],
+            //     'secondDistrictCongressmanPreference' => $data[12],
+            //     'mayorPreference' => $data[13]
+            // }
+           
         ];
+        $i = 11;
+        foreach($fieldary as $field){
+            // echo $field;exit;
+            $voter[$field] = $data[$i];
+            $i++;
+        }
+        $voters[] = $voter;
     }
     $rowNumber++;
 }
+// var_dump($categories);exit;
 foreach ($categories as $key => $data) {
     $totalVotes = array_sum($data);
     foreach ($data as $location => $count) {
         $categories[$key][$location] = ($count / $totalVotes) * 100;
     }
 }
+// var_dump($voters);exit;
 $categoriesJson = json_encode($categories);
 $votersJson = json_encode($voters);
+$fieldsJson = json_encode($fieldary);
 
 
 
@@ -163,6 +185,7 @@ if (!empty($_SESSION['user'])) {
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             margin-top: 50px;
+            /* position: relative; */
         }
 
         .header {
@@ -345,6 +368,15 @@ if (!empty($_SESSION['user'])) {
             cursor: pointer;
         }
 
+        .chat_link{
+            position: fixed;
+            bottom: 30px;
+            right: 10px;
+            z-index: 100;
+            /* width: 50px;
+            height: 50px; */
+        }
+
         /* List of search results */
         #voterSearchResults,
         #voterBirthdayResults,
@@ -433,28 +465,29 @@ if (!empty($_SESSION['user'])) {
         <div class="dropdown-container">
             
             <div id = "cityoptiondiv" style = "display:none;">
-                <label for="city-preference" id = "optionlbl"></label>
+                <label for="optiontype" id = "optionlbl"></label>
                 <select id="optiontype" onchange="updateData()">
                     
                 </select>
             </div>
-            <div id = "titlediv" style = "display:none;">
+            <div id = "surveydiv" style = "display:none">
                 <label for="governor-preference">SURVEY QUESTIONS:</label>
                 <select id="governor-preference" onchange="titleChange(this)">
-                    <option value=""></option>
+                    <!-- <option value=""></option>
                     <option value="governorPreference">GOVERNOR PREFERENCE</option>
                     <option value="secondDistrictCongressmanPreference">SECOND DISTRICT CONGRESSMAN PREFERENCE</option>
-                    <option value="mayorPreference">MAYOR PREFERENCE
+                    <option value="mayorPreference">MAYOR PREFERENCE -->
                     </option>
                     <!-- Add more options as needed -->
                 </select>
             </div>
             <div>
-                <input type="text" placeholder="Search...">
+                <!-- <input type="text" name="Search" placeholder="Search..."> -->
             </div>
         </div>
 
         <!-- Graphs -->
+         <?php if(!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'user'){ ?>
         <div class="graphs">
             <div class="graph">
                 <h2 id = "barchart_title">Governor Preference</h2>
@@ -465,134 +498,138 @@ if (!empty($_SESSION['user'])) {
                 <canvas id="myLineChart" width="400" height="200"></canvas> <!-- Corrected ID -->
             </div>
         </div>
-
+        <?php }?>    
         <!-- Top Menu Bar -->
         <div class="menu-bar tabs">
-            <a class="tab" data-tab="ANALYZE">ANALYZE</a>
+            
             <?php
 
-            if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
+            if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] == 'user') {
             } else {
                 ?>
-                <a class="tab" data-tab="PLAN" href="plan_index.php">PLAN</a>
+                  <a class="tab" data-tab="ANALYZE">ANALYZE</a>
             <?php } ?>
+            <a class="tab" data-tab="PLAN" href="plan_index.php">PLAN</a>
             <a class="tab" data-tab="SEARCH-GATHER">SEARCH GATHER</a>
-            <a class="tab" data-tab="MEET-COMM">MEET COMM</a>
+            <!-- <a class="tab" data-tab="MEET-COMM">MEET COMM</a> -->
             <a class="tab" data-tab="PROGRAMS-FIN">PROGRAMS/FIN</a>
             <?php
 
             if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
             } else {
                 ?>
-                <a href="survey_list.php">SURVEY</a>
+                
             <?php } ?>
+            <a href="survey_list.php">SURVEY</a>
             <a class="tab" data-tab="SOCIAL-MEDIA">SOC. MEDIA</a>
             <?php
 
-            if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
+            if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] == 'user') {
             } else {
                 ?>
                 <a class="tab" data-tab="MANAGE-DATA" href="list_voters.php">MANAGE DATA</a>
             <?php } ?>
+            
         </div>
 
         <!-- Menu Items -->
         <div class="menu">
 
-            <div class="menu-item">
-                <div>
-                    <h3>HISTOGRAM</h3>
-                    <p data-category="PROVINCE" class="menu-item-child" data-type="HISTOGRAM">Provincial</p>
-                    <p data-category="PROVINCE" class="menu-item-child" data-type="HISTOGRAM">District</p>
-                    <p data-category="CITY" class="menu-item-child" data-type="HISTOGRAM">Municipal/City</p>
-                    <p data-category="BARANGAY" class="menu-item-child" data-type="HISTOGRAM">Barangay</p>
-                    <p data-category="PRECINCT" class="menu-item-child" data-type="HISTOGRAM">Precinct</p>
-                    <p data-category="SEX" class="menu-item-child" data-type="HISTOGRAM">Gender</p>
-                </div>
-                <div>
-                    <h3>LINE GRAPHS</h3>
-                    <p data-category="PROVINCE" class="menu-item-child" data-type="LINE-GRAPHS">search</p>
-                    <p data-category="PROVINCE" class="menu-item-child" data-type="LINE-GRAPHS">District</p>
-                    <p data-category="CITY" class="menu-item-child" data-type="LINE-GRAPHS">Municipal/City</p>
-                    <p data-category="BARANGAY" class="menu-item-child" data-type="LINE-GRAPHS">Barangay</p>
-                    <p data-category="PRECINCT" class="menu-item-child" data-type="LINE-GRAPHS">Precinct</p>
-                    <p data-category="SEX" class="menu-item-child" data-type="LINE-GRAPHS">Gender</p>
-                </div>
-                <div>
-                    <h3>TABLES</h3>
-                    <p>search</p>
-                    <p>District</p>
-                    <p>Municipal/City</p>
-                    <p>Barangay</p>
-                    <p>Precinct</p>
-                </div>
-                <div>
-                    <h3>MAPS</h3>
-                    <p>Provincial</p>
-                    <p>District</p>
-                    <p>Municipal/City</p>
-                    <p>Barangay</p>
-                    <p>Precinct</p>
-                </div>
-            </div>
+            
 
             <?php
 
-            if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
+            if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] == 'user') {
             } else {
                 ?>
-                <!-- PLAN -->
                 <div class="menu-item">
-                    <h3>PROVINCIAL</h3>
-                    <p class="option-filter" data-type-filter="provincial" data-value="National">National</p>
-                    <p class="option-filter" data-type-filter="provincial" data-value="Regional">Regional</p>
-                    <p class="option-filter" data-type-filter="provincial" data-value="First District">First District</p>
-                    <p class="option-filter" data-type-filter="provincial" data-value="Second District">Second District</p>
-                    <p class="option-filter" data-type-filter="provincial" data-value="Third District">Third District</p>
-                    <h3>MUNICIPAL/CITY</h3>
-                    <p class="option-filter" data-type-filter="municipal" data-value="Agdangan">Agdangan</p>
-                    <p class="option-filter" data-type-filter="municipal" data-value="Alabat">Alabat</p>
-                    <p class="option-filter" data-type-filter="municipal" data-value="Atimonan">Atimonan</p>
-                    <p class="option-filter" data-type-filter="municipal" data-value="Buenavista">Buenavista</p>
-                    <p class="option-filter" data-type-filter="municipal" data-value="Burdeos">Burdeos</p>
-                    <p class="option-filter" data-type-filter="municipal" data-value="Calauag">Calauag</p>
-                    <p class="option-filter" data-type-filter="municipal" data-value="Catanauan">Catanauan</p>
-                    <p class="option-filter" data-type-filter="municipal" data-value="Dolores">Dolores</p>
-                    <p class="option-filter" data-type-filter="municipal" data-value="General Luna">General Luna</p>
-
-                    <h3>BARANGAY</h3>
-                    <p class="option-filter" data-type-filter="barangay" data-value="A. Mabini, Guinayangan">A. Mabini,
-                        Guinayangan
-                    </p>
-                    <p class="option-filter" data-type-filter="barangay" data-value="Abang, Lucban">Abang, Lucban</p>
-                    <p class="option-filter" data-type-filter="barangay" data-value="Abiawin, Infanta">Abiawin, Infanta</p>
-                    <p class="option-filter" data-type-filter="barangay" data-value="Abo-abo, Mauban">Abo-abo, Mauban</p>
-                    <p class="option-filter" data-type-filter="barangay" data-value="Abuyon, San Narciso">Abuyon, San
-                        Narciso</p>
-                    <p class="option-filter" data-type-filter="barangay" data-value="Adia Bitago, Gen. Nakar">Adia Bitago,
-                        Gen.
-                        Nakar</p>
-                    <p class="option-filter" data-type-filter="barangay" data-value="Agaoho, Calauag">Agaoho, Calauag</p>
-                    <p class="option-filter" data-type-filter="barangay" data-value="Agos-agos, Infanta">Agos-agos, Infanta
-                    </p>
-                    <p class="option-filter" data-type-filter="barangay" data-value="Ajus, Catanauan">Ajus, Catanauan</p>
-
-                    <h3>PRECINCT</h3>
-                    <p class="option-filter" data-type-filter="precinct" data-value="0022A">0022A</p>
-                    <p class="option-filter" data-type-filter="precinct" data-value="0022B">0022B</p>
-                    <p class="option-filter" data-type-filter="precinct" data-value="0022C">0022C</p>
-                    <p class="option-filter" data-type-filter="precinct" data-value="0022D">0022D</p>
-                    <p class="option-filter" data-type-filter="precinct" data-value="0022E">0022E</p>
-                    <p class="option-filter" data-type-filter="precinct" data-value="0022F">0022F</p>
-                    <p class="option-filter" data-type-filter="precinct" data-value="0022G">0022G</p>
-                    <p class="option-filter" data-type-filter="precinct" data-value="0022H">0022H</p>
-                    <p class="option-filter" data-type-filter="precinct" data-value="0022I">0022I</p>
-                    <p class="option-filter" data-type-filter="precinct" data-value="0022J">0022J</p>
+                    <div>
+                        <h3>HISTOGRAM</h3>
+                        <p data-category="PROVINCE" class="menu-item-child" data-type="HISTOGRAM">Provincial</p>
+                        <p data-category="PROVINCE" class="menu-item-child" data-type="HISTOGRAM">District</p>
+                        <p data-category="CITY" class="menu-item-child" data-type="HISTOGRAM">Municipal/City</p>
+                        <p data-category="BARANGAY" class="menu-item-child" data-type="HISTOGRAM">Barangay</p>
+                        <p data-category="PRECINCT" class="menu-item-child" data-type="HISTOGRAM">Precinct</p>
+                        <p data-category="SEX" class="menu-item-child" data-type="HISTOGRAM">Gender</p>
+                    </div>
+                    <div>
+                        <h3>LINE GRAPHS</h3>
+                        <p data-category="PROVINCE" class="menu-item-child" data-type="LINE-GRAPHS">search</p>
+                        <p data-category="PROVINCE" class="menu-item-child" data-type="LINE-GRAPHS">District</p>
+                        <p data-category="CITY" class="menu-item-child" data-type="LINE-GRAPHS">Municipal/City</p>
+                        <p data-category="BARANGAY" class="menu-item-child" data-type="LINE-GRAPHS">Barangay</p>
+                        <p data-category="PRECINCT" class="menu-item-child" data-type="LINE-GRAPHS">Precinct</p>
+                        <p data-category="SEX" class="menu-item-child" data-type="LINE-GRAPHS">Gender</p>
+                    </div>
+                    <div>
+                        <h3>TABLES</h3>
+                        <p>search</p>
+                        <p>District</p>
+                        <p>Municipal/City</p>
+                        <p>Barangay</p>
+                        <p>Precinct</p>
+                    </div>
+                    <div>
+                        <h3>MAPS</h3>
+                        <p>Provincial</p>
+                        <p>District</p>
+                        <p>Municipal/City</p>
+                        <p>Barangay</p>
+                        <p>Precinct</p>
+                    </div>
                 </div>
                 <?php
             }
 
             ?>
+            <!-- PLAN -->
+            <div class="menu-item">
+                <h3>PROVINCIAL</h3>
+                <p class="option-filter" data-type-filter="provincial" data-value="National">National</p>
+                <p class="option-filter" data-type-filter="provincial" data-value="Regional">Regional</p>
+                <p class="option-filter" data-type-filter="provincial" data-value="First District">First District</p>
+                <p class="option-filter" data-type-filter="provincial" data-value="Second District">Second District</p>
+                <p class="option-filter" data-type-filter="provincial" data-value="Third District">Third District</p>
+                <h3>MUNICIPAL/CITY</h3>
+                <p class="option-filter" data-type-filter="municipal" data-value="Agdangan">Agdangan</p>
+                <p class="option-filter" data-type-filter="municipal" data-value="Alabat">Alabat</p>
+                <p class="option-filter" data-type-filter="municipal" data-value="Atimonan">Atimonan</p>
+                <p class="option-filter" data-type-filter="municipal" data-value="Buenavista">Buenavista</p>
+                <p class="option-filter" data-type-filter="municipal" data-value="Burdeos">Burdeos</p>
+                <p class="option-filter" data-type-filter="municipal" data-value="Calauag">Calauag</p>
+                <p class="option-filter" data-type-filter="municipal" data-value="Catanauan">Catanauan</p>
+                <p class="option-filter" data-type-filter="municipal" data-value="Dolores">Dolores</p>
+                <p class="option-filter" data-type-filter="municipal" data-value="General Luna">General Luna</p>
+
+                <h3>BARANGAY</h3>
+                <p class="option-filter" data-type-filter="barangay" data-value="A. Mabini, Guinayangan">A. Mabini,
+                    Guinayangan
+                </p>
+                <p class="option-filter" data-type-filter="barangay" data-value="Abang, Lucban">Abang, Lucban</p>
+                <p class="option-filter" data-type-filter="barangay" data-value="Abiawin, Infanta">Abiawin, Infanta</p>
+                <p class="option-filter" data-type-filter="barangay" data-value="Abo-abo, Mauban">Abo-abo, Mauban</p>
+                <p class="option-filter" data-type-filter="barangay" data-value="Abuyon, San Narciso">Abuyon, San
+                    Narciso</p>
+                <p class="option-filter" data-type-filter="barangay" data-value="Adia Bitago, Gen. Nakar">Adia Bitago,
+                    Gen.
+                    Nakar</p>
+                <p class="option-filter" data-type-filter="barangay" data-value="Agaoho, Calauag">Agaoho, Calauag</p>
+                <p class="option-filter" data-type-filter="barangay" data-value="Agos-agos, Infanta">Agos-agos, Infanta
+                </p>
+                <p class="option-filter" data-type-filter="barangay" data-value="Ajus, Catanauan">Ajus, Catanauan</p>
+
+                <h3>PRECINCT</h3>
+                <p class="option-filter" data-type-filter="precinct" data-value="0022A">0022A</p>
+                <p class="option-filter" data-type-filter="precinct" data-value="0022B">0022B</p>
+                <p class="option-filter" data-type-filter="precinct" data-value="0022C">0022C</p>
+                <p class="option-filter" data-type-filter="precinct" data-value="0022D">0022D</p>
+                <p class="option-filter" data-type-filter="precinct" data-value="0022E">0022E</p>
+                <p class="option-filter" data-type-filter="precinct" data-value="0022F">0022F</p>
+                <p class="option-filter" data-type-filter="precinct" data-value="0022G">0022G</p>
+                <p class="option-filter" data-type-filter="precinct" data-value="0022H">0022H</p>
+                <p class="option-filter" data-type-filter="precinct" data-value="0022I">0022I</p>
+                <p class="option-filter" data-type-filter="precinct" data-value="0022J">0022J</p>
+            </div>            
 
             <!-- SEARCH GATHER -->
             <div class="menu-item">
@@ -612,7 +649,7 @@ if (!empty($_SESSION['user'])) {
             </div>
 
             <!-- MEET COMM. -->
-            <div class="menu-item">
+            <!-- <div class="menu-item">
                 <h3>EXE/COM</h3>
                 <p data-type="Top Managers" class="manager-filter">Top Managers</p>
                 <p data-type="Mid Managers" class="manager-filter">Mid Managers</p>
@@ -650,7 +687,7 @@ if (!empty($_SESSION['user'])) {
                 <p data-precinct="0022H" class="precinct-filter">0022H</p>
                 <p data-precinct="0022I" class="precinct-filter">0022I</p>
                 <p data-precinct="0022J" class="precinct-filter">0022J</p>
-            </div>
+            </div> -->
 
 
 
@@ -698,15 +735,15 @@ if (!empty($_SESSION['user'])) {
             if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
             } else {
                 ?>
-                <!-- SURVEY -->
-                <div class="menu-item">
-                    <h3>FORM</h3>
-                    <p><a href="create_survey.php">Design</a></p>
-                    <p>Respondents</p>
-                    <p>Survey</p>
-                </div>
-            <?php } ?>
 
+            <?php } ?>
+            <!-- SURVEY -->
+            <div class="menu-item">
+                <h3>FORM</h3>
+                <p><a href="create_survey.php">Design</a></p>
+                <p>Respondents</p>
+                <p>Survey</p>
+            </div>
             <!-- SOC. MEDIA -->
             <div class="menu-item">
                 <h3>VIDEO</h3>
@@ -740,19 +777,22 @@ if (!empty($_SESSION['user'])) {
             </div>
             <?php
 
-            if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
+            if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] == 'user') {
             } else {
                 ?>
                 <!-- MANAGE DATA -->
                 <div class="menu-item">
                     <h3>ADD VARIABLES</h3>
-                    <p id="export">Export</p>
+                    <p><a href="list_voters.php">Voters List</a></p>
+                    <p><a href="list_users.php">Users List</a></p>
+                    <!-- <p>Export</p>
                     <p id = "import">Import</p>
                     <p>Logs</p>
                     <p>Edit Criteria</p>
-                    <p>Password</p>
-                </div>
+                    <p>Password</p> -->
+                </div>  
             <?php } ?>
+          
 
             <div id = "fileuploaddiv" class = "popup">
                 <div class="popup-content">
@@ -804,7 +844,14 @@ if (!empty($_SESSION['user'])) {
 
 
         </div>
+
+       
     </div>
+        <div class = "chat_link">
+            <a href = "chat.php">
+                <img src = './assets/chat.png' width="50px" height="50px"></img>
+            </a>
+        </div>
     </div>
 </body>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -834,9 +881,27 @@ if (!empty($_SESSION['user'])) {
 
     window.onload = function () {
         var categories = <?php echo $categoriesJson; ?>;
+        var fields = <?php echo $fieldsJson; ?>;
         // console.log(categories);
         var barCtx = document.getElementById('myBarChart').getContext('2d');
         var lineCtx = document.getElementById('myLineChart').getContext('2d');
+
+        updateCmb();
+
+        function updateCmb(){
+            optionElement = document.getElementById("governor-preference");
+            optionElement.innerHTML = "";
+            const option = document.createElement('option');
+                option.value = "";
+                option.textContent = "";
+                optionElement.appendChild(option);                        
+            fields.forEach(function(value){
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                optionElement.appendChild(option);
+            });
+        }
 
         function updateChart(chart, data) {
             // Skip the first row (menu heading) in the data
@@ -933,6 +998,8 @@ if (!empty($_SESSION['user'])) {
                 updateData();
         }
 
+ 
+
         updateData = function (){
             var element1 = document.getElementById("optiontype");
             var element2 = document.getElementById("governor-preference");
@@ -944,24 +1011,28 @@ if (!empty($_SESSION['user'])) {
                 // alert("a");
                 var voters = <?php echo $votersJson; ?>;
                 // console.log(voters);
-                const filterData = voters.filter(voter => String(voter[type]).toLowerCase().includes(selecttxt1.toLowerCase()));
+                const filterData = voters.filter(voter => String(voter[type]).toLowerCase() === (selecttxt1.toLowerCase()));
+                console.log(filterData);
                 const count = filterData.length/100;
                 const chartData = filterData.reduce((acc, item) => {
                     
                     // console.log(count);
-                    const ftype = item[selecttxt2];                    
+                    let ftype = item[selecttxt2];  
+                    // if (ftype == null) {
+                    //     ftype = undefined; // Assign a default category for null values
+                    // } 
+                    console.log(ftype);             
                     // Increment the count for the category
                     if (!acc[ftype]) {
                         acc[ftype] = 0; // Initialize if not present
+                        
                     }
-                    acc[ftype] += (1 / count);;
+                    acc[ftype] += (1 / count);
                     return acc;
                 }, {});
                            
                 updateChart(myBarChart, chartData);
                 updateChart(myLineChart, chartData);
-            }else{
-                header("Location: dashboard.php");
             }
             
         }
@@ -975,8 +1046,6 @@ if (!empty($_SESSION['user'])) {
                 // console.log(category);
                 if (this.getAttribute('data-type') === 'HISTOGRAM') {
                     updateChart(myBarChart, data);
-                    document.getElementById("cityoptiondiv").style = "display:none";
-                    document.getElementById("titlediv").style = "display:none";
                     // console.log(categories[category]);
                     if(this.innerHTML == "Provincial") {
                         document.getElementById("optionlbl").innerHTML = "PROVINCE:";
@@ -994,7 +1063,7 @@ if (!empty($_SESSION['user'])) {
                             optionElement.appendChild(option);
                         });
                         document.getElementById("cityoptiondiv").style = "display:block";
-                        document.getElementById("titlediv").style = "display:block";
+                        document.getElementById("surveydiv").style = "display:block";
                     }
                     if(this.innerHTML == "Municipal/City") {
                         document.getElementById("optionlbl").innerHTML = "Municipal/City:";
@@ -1012,11 +1081,10 @@ if (!empty($_SESSION['user'])) {
                             optionElement.appendChild(option);
                         });
                         document.getElementById("cityoptiondiv").style = "display:block";
-                        document.getElementById("titlediv").style = "display:block";
+                        document.getElementById("surveydiv").style = "display:block";
                     }
                 } else if (this.getAttribute('data-type') === 'LINE-GRAPHS') {
                     updateChart(myLineChart, data);
-                    document.getElementById("cityoptiondiv").style = "display:none";
                 }
             });
         });
@@ -1339,9 +1407,7 @@ if (!empty($_SESSION['user'])) {
     });
 
 
-    document.getElementById('export').addEventListener('click', function() {
-        window.location.href = 'download.php'; // Link to your PHP script
-    });
+
 
 
 </script>

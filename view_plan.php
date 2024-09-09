@@ -205,6 +205,22 @@ $teams = mysqli_query($conn, $teams_query);
         .task-form button:hover {
             background-color: #0056b3;
         }
+
+        .planlist-back {
+            position: fixed;
+            float: left;
+            left: 20px;
+            bottom: 30px;
+            width: 50px;
+            height: 50px;
+        }
+        .planlist-back img{
+            width: 100%;
+            cursor: pointer;
+        }
+
+
+
     </style>
 </head>
 
@@ -289,6 +305,7 @@ $teams = mysqli_query($conn, $teams_query);
 </div>
 
     </div>
+    <div class="planlist-back"><img src="https://svgrepo.com/show/67631/back-arrow.svg" onclick="window.history.back()"></img></div>
 </body>
 
 </html>

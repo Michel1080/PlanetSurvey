@@ -105,6 +105,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             margin-bottom: 20px;
             color: #28a745;
         }
+        .planlist-back {
+            position: fixed;
+            float: left;
+            left: 20px;
+            bottom: 30px;
+            width: 50px;
+            height: 50px;
+        }
+        .planlist-back img{
+            width: 100%;
+            cursor: pointer;
+        }
+
+
+
     </style>
 </head>
 <body>
@@ -157,5 +172,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <button type="submit">Assign Task</button>
         </form>
     </div>
+    <div class="planlist-back"><img src="https://svgrepo.com/show/67631/back-arrow.svg" onclick="window.history.back()"></img></div>
 </body>
 </html>

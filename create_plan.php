@@ -211,6 +211,20 @@ select option:hover {
     background-color: #f0f0f0;
 }
 
+.planlist-back {
+            position: fixed;
+            float: left;
+            left: 20px;
+            bottom: 30px;
+            width: 50px;
+            height: 50px;
+        }
+        .planlist-back img{
+            width: 100%;
+            cursor: pointer;
+        }
+
+
 
     </style>
 </head>
@@ -336,7 +350,7 @@ select option:hover {
             <button type="submit"><i class="fas fa-save"></i> Create Plan</button>
         </form>
     </div>
-
+    <div class="planlist-back"><img src="https://svgrepo.com/show/67631/back-arrow.svg" onclick="window.history.back()"></img></div>
     <script>
         document.querySelectorAll('.option').forEach(option => {
             option.addEventListener('click', function() {

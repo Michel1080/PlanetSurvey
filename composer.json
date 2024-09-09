@@ -2,6 +2,13 @@
     "require": {
         "facebook/graph-sdk": "^5.1",
         "phpoffice/phpspreadsheet": "^2.2",
-        "google/apiclient": "^2.17" 
+        "google/apiclient": "^2.17" ,
+        "cboden/ratchet": "^0.4.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "PhpOffice\\PhpSpreadsheet\\": "src/PhpSpreadsheet",
+            "MyApp\\": "src/"
+        }
     }
 }

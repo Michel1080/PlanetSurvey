@@ -6,6 +6,24 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     exit;
 }
 
+require 'vendor/autoload.php';
+
+use PhpOffice\PhpSpreadsheet\IOFactory;
+
+$filename = 'data.xlsx';
+
+if (file_exists($filename)) {
+    $spreadsheet = IOFactory::load($filename);
+    $worksheet = $spreadsheet->getActiveSheet();
+    $highestColumn = $worksheet->getHighestColumn();
+    $highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
+    $row1 =1;
+    $headerData = $worksheet->rangeToArray("A$row1:$highestColumn$row1")[0];
+    // var_dump($headerData);exit;
+} else {
+    die("Voter not found.");
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -89,6 +107,20 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
             border-radius: 4px;
             border: 1px solid #ddd;
         }
+        .planlist-back {
+            position: fixed;
+            float: left;
+            left: 20px;
+            bottom: 30px;
+            width: 50px;
+            height: 50px;
+        }
+        .planlist-back img{
+            width: 100%;
+            cursor: pointer;
+        }
+
+
     </style>
 </head>
 
@@ -151,24 +183,19 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
                 <input type="text" id="cp" name="cp">
             </div>
 
-            <div class="form-group">
-                <label for="governor">Governor Preference:</label>
-                <input type="text" id="governor" name="governor">
-            </div>
-
-            <div class="form-group">
-                <label for="congressman">Second District Congressman Preference:</label>
-                <input type="text" id="congressman" name="congressman">
-            </div>
-
-            <div class="form-group">
-                <label for="mayor">Mayor Preference:</label>
-                <input type="text" id="mayor" name="mayor">
-            </div>
+            <?php
+                for($i = 11; $i<$highestColumnIndex; $i++){
+                    echo "<div class = 'form-group'>";
+                    echo "<label for =".$headerData[$i]."> ".$headerData[$i]."";    
+                    echo "<input type = 'text' id =".$headerData[$i]." name = ".$headerData[$i].">";                    
+                    echo "</div>";
+                }
+            ?>
 
             <button type="submit">Save Voter</button>
         </form>
     </div>
+    <div class="planlist-back"><img src="https://svgrepo.com/show/67631/back-arrow.svg" onclick="window.history.back()"></img></div>
 </body>
 
 </html>

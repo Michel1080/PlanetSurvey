@@ -204,6 +204,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             gap: 50px;
             align-items: start;
         }
+
+        .planlist-back {
+            position: fixed;
+            float: left;
+            left: 20px;
+            bottom: 30px;
+            width: 50px;
+            height: 50px;
+        }
+        .planlist-back img{
+            width: 100%;
+            cursor: pointer;
+        }
+
+
     </style>
 </head>
 
@@ -247,7 +262,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </form>
         </div>
     </div>
-
+    <div class="planlist-back"><img src="https://svgrepo.com/show/67631/back-arrow.svg" onclick="window.history.back()"></img></div>
     <script>
         const questionsList = document.getElementById('questionsList');
 

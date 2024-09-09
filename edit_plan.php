@@ -184,6 +184,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .add-activity-button:hover {
             background-color: #218838;
         }
+
+        .planlist-back {
+            position: fixed;
+            float: left;
+            left: 20px;
+            bottom: 30px;
+            width: 50px;
+            height: 50px;
+        }
+        .planlist-back img{
+            width: 100%;
+            cursor: pointer;
+        }
+
     </style>
 </head>
 
@@ -280,6 +294,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
         </form>
     </div>
+    <div class="planlist-back"><img src="https://svgrepo.com/show/67631/back-arrow.svg" onclick="window.history.back()"></img></div>
     <script>
         document.getElementById('add_activity').addEventListener('click', function () {
             const activitiesDiv = document.getElementById('activities');

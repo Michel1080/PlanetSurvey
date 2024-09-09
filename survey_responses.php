@@ -92,6 +92,21 @@ if (isset($_GET['survey_id']) && is_numeric($_GET['survey_id'])) {
         .back-button:hover {
             background-color: #45a049;
         }
+        .planlist-back {
+            position: fixed;
+            float: left;
+            left: 20px;
+            bottom: 30px;
+            width: 50px;
+            height: 50px;
+        }
+        .planlist-back img{
+            width: 100%;
+            cursor: pointer;
+        }
+
+
+
     </style>
 </head>
 <body>
@@ -119,6 +134,7 @@ if (isset($_GET['survey_id']) && is_numeric($_GET['survey_id'])) {
         <?php endif; ?>
         <a href="survey_list.php" class="back-button">Back to Survey List</a>
     </div>
+    <div class="planlist-back"><img src="https://svgrepo.com/show/67631/back-arrow.svg" onclick="window.history.back()"></img></div>
 </body>
 </html>
 

@@ -87,6 +87,20 @@ $plans = mysqli_query($conn, $query);
             justify-content: space-between;
             align-items: center;
         }
+        .planlist-back {
+            position: fixed;
+            float: left;
+            left: 20px;
+            bottom: 30px;
+            width: 50px;
+            height: 50px;
+        }
+        .planlist-back img{
+            width: 100%;
+            cursor: pointer;
+        }
+
+
     </style>
 </head>
 <body>
@@ -110,5 +124,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
             <?php } ?>
         </ul>
     </div>
+    <div class="planlist-back"><img src="https://svgrepo.com/show/67631/back-arrow.svg" onclick="window.history.back()"></img></div>
 </body>
 </html>
